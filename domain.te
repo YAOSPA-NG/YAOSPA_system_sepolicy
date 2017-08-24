@@ -432,7 +432,7 @@ neverallow { domain userdebug_or_eng(`-dumpstate -shell -su') } su_exec:file no_
 # https://code.google.com/p/android/issues/detail?id=23203
 # which, long term, need to go away.
 ifelse(target_needs_platform_text_relocations, `true',
-  `neverallow * {
+  `neverallow { domain -audioserver } {
     file_type
     -system_file
     -system_data_file
@@ -441,7 +441,7 @@ ifelse(target_needs_platform_text_relocations, `true',
     -asec_public_file
   }:file execmod;'
 ,
-  `neverallow * {
+  `neverallow { domain -audioserver } {
     file_type
     -system_data_file
     -apk_data_file
@@ -458,7 +458,7 @@ neverallow * self:process { execstack execheap };
 # prohibit non-zygote spawned processes from using shared libraries
 # with text relocations. b/20013628 .
 ifelse(target_needs_platform_text_relocations, `true', ,
-  `neverallow { domain -appdomain } file_type:file execmod;'
+  `neverallow { domain -appdomain -audioserver } file_type:file execmod;'
 )
 
 neverallow { domain -init } proc:{ file dir } mounton;
@@ -485,6 +485,7 @@ neverallow {
   -system_app
   -init
   -interfacer
+  -arise
   -installd # for relabelfrom and unlink, check for this in explicit neverallow
 } system_data_file:file no_w_file_perms;
 # do not grant anything greater than r_file_perms and relabelfrom unlink
